@@ -100,21 +100,13 @@ RUN GRYPE_TAR="grype_${GRYPE_VERSION}_linux_amd64.tar.gz" \
     && grype version
 
 # -----------------------------------------------------------------------------
-# Cosign — container signing & verification
-# NOTE: Pinned to v2.4.3. v3.x has breaking --bundle flag changes.
-# The .sha256 file contains: "HASH  cosign-linux-amd64" (filename not full path)
-# So we download to a temp location first, verify, then move
+# Cosign — copied from official image (pinned v2.4.3, last stable v2)
+# Using COPY --from avoids download + checksum format issues entirely
 # -----------------------------------------------------------------------------
-RUN wget -q "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64" \
-         -O /tmp/cosign-linux-amd64 \
-    && wget -q "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64.sha256" \
-         -O /tmp/cosign.sha256 \
-    && cd /tmp \
-    && sha256sum -c cosign.sha256 \
-    && mv /tmp/cosign-linux-amd64 /usr/local/bin/cosign \
-    && chmod +x /usr/local/bin/cosign \
-    && rm -f /tmp/cosign.sha256 \
-    && cosign version
+COPY --from=gcr.io/projectsigstore/cosign:v2.4.3 /ko-app/cosign /usr/local/bin/cosign
+RUN cosign version
+
+
 # -----------------------------------------------------------------------------
 # AWS CLI v2 — official versioned installer
 # -----------------------------------------------------------------------------
