@@ -108,15 +108,15 @@ RUN cosign version
 
 
 # -----------------------------------------------------------------------------
-# AWS CLI v2 — official versioned installer
+# AWS CLI v2 — official versioned installer with signature verification
 # -----------------------------------------------------------------------------
 RUN curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip" \
-         -o awscliv2.zip \
+         -o /tmp/awscliv2.zip \
     && curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip.sig" \
-         -o awscliv2.zip.sig \
-    && unzip -q awscliv2.zip \
-    && ./aws/install \
-    && rm -rf awscliv2.zip awscliv2.zip.sig aws \
+         -o /tmp/awscliv2.zip.sig \
+    && unzip -q /tmp/awscliv2.zip -d /tmp \
+    && /tmp/aws/install \
+    && rm -rf /tmp/awscliv2.zip /tmp/awscliv2.zip.sig /tmp/aws \
     && aws --version
 
 # -----------------------------------------------------------------------------
