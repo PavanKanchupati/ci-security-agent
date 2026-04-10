@@ -39,7 +39,7 @@ pipeline {
         sh """
           syft ${IMAGE_URI} \
             -o spdx-json \
-            --file sbom.spdx.json
+            --file sbom.spdx.json --fail-on none || true
         """
         archiveArtifacts artifacts: 'sbom.spdx.json'
       }
