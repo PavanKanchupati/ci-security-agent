@@ -101,20 +101,20 @@ RUN GRYPE_TAR="grype_${GRYPE_VERSION}_linux_amd64.tar.gz" \
 
 # -----------------------------------------------------------------------------
 # Cosign — container signing & verification
-# IMPORTANT: Pinned to v2.4.3 (last stable v2).
-#            v3.x (latest as of Apr 2026) has breaking changes:
-#            --bundle flag is now REQUIRED, new bundle format on by default.
-#            Stay on v2 until you are ready to update your Jenkinsfile flags.
+# NOTE: Pinned to v2.4.3. v3.x has breaking --bundle flag changes.
+# The .sha256 file contains: "HASH  cosign-linux-amd64" (filename not full path)
+# So we download to a temp location first, verify, then move
 # -----------------------------------------------------------------------------
 RUN wget -q "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64" \
-         -O /usr/local/bin/cosign \
+         -O /tmp/cosign-linux-amd64 \
     && wget -q "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64.sha256" \
          -O /tmp/cosign.sha256 \
-    && echo "$(cat /tmp/cosign.sha256)  /usr/local/bin/cosign" | sha256sum -c - \
+    && cd /tmp \
+    && sha256sum -c cosign.sha256 \
+    && mv /tmp/cosign-linux-amd64 /usr/local/bin/cosign \
     && chmod +x /usr/local/bin/cosign \
     && rm -f /tmp/cosign.sha256 \
     && cosign version
-
 # -----------------------------------------------------------------------------
 # AWS CLI v2 — official versioned installer
 # -----------------------------------------------------------------------------
