@@ -2,25 +2,32 @@ pipeline {
   agent any
 
   environment {
-    AWS_REGION   = "ap-south-1"
-    ECR_REGISTRY = "959959864512.dkr.ecr.ap-south-1.amazonaws.com"
-    ECR_REPO     = "platform/ci-agent"
-    IMAGE_TAG    = "1.0.0"
-    IMAGE_URI    = "${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}"
-  }
+  AWS_REGION   = "ap-south-1"
+  ECR_REGISTRY = "959959864512.dkr.ecr.ap-south-1.amazonaws.com"
+  ECR_REPO     = "platform/ci-agent"
+  BUILD_ID     = "${env.BUILD_NUMBER}"
+  GIT_COMMIT   = "${env.GIT_COMMIT_SHORT}"
+  IMAGE_TAG    = "${BUILD_ID}-${GIT_COMMIT}"
+  IMAGE_URI    = "${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}"
+  IMAGE_LATEST = "${ECR_REGISTRY}/${ECR_REPO}:latest"
+}
 
-  stages {
-
-    stage('Build') {
-      steps {
-        sh """
-          docker build \
-            --build-arg BUILD_DATE=\$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
-            --build-arg VCS_REF=\$(git rev-parse --short HEAD) \
-            -t ${IMAGE_URI} .
-        """
-      }
+  stage('Build') {
+  steps {
+    script {
+      env.GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+      env.BUILD_NUMBER = env.BUILD_NUMBER ?: "0"
     }
+    sh """
+      docker build \
+        --build-arg BUILD_DATE=\$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+        --build-arg VCS_REF=\$(git rev-parse --short HEAD) \
+        -t ${IMAGE_URI} \
+        -t ${IMAGE_LATEST} \
+        .
+    """
+  }
+}
 
     stage('Scan — Trivy') {
       steps {
@@ -55,24 +62,19 @@ pipeline {
     }
 
     stage('Push to ECR') {
-      steps {
-        sh """
-          aws ecr get-login-password --region ${AWS_REGION} \
-            | docker login \
-                --username AWS \
-                --password-stdin ${ECR_REGISTRY}
-
-          docker push ${IMAGE_URI}
-
-          docker inspect \
-            --format='{{index .RepoDigests 0}}' \
-            ${IMAGE_URI} > image_digest.txt
-
-          echo "Pushed: \$(cat image_digest.txt)"
-        """
-        archiveArtifacts artifacts: 'image_digest.txt'
-      }
-    }
+  steps {
+    sh """
+      aws ecr get-login-password --region ${AWS_REGION} \
+        | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+      
+      docker push ${IMAGE_URI}
+      docker push ${IMAGE_LATEST}
+      
+      docker inspect --format='{{index .RepoDigests 0}}' ${IMAGE_URI} > image_digest.txt
+    """
+    archiveArtifacts artifacts: 'image_digest.txt'
+  }
+}
 
     stage('Sign & Attest — Cosign') {
       steps {
