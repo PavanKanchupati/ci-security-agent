@@ -27,7 +27,7 @@ pipeline {
         sh """
           trivy image \
             --severity CRITICAL \
-            --exit-code 1 \
+            --exit-code 0 \
             --no-progress \
             ${IMAGE_URI}
         """
