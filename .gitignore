@@ -1,0 +1,6 @@
+cosign.key
+*.key
+*.pem
+/tmp/
+sbom.spdx.json
+image_digest.txt
