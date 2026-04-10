@@ -29,7 +29,7 @@ ARG KUBECTL_VERSION=1.33.0
 ARG HELM_VERSION=3.20.2
 ARG DEPENDENCY_CHECK_VERSION=12.2.0
 ARG SEMGREP_VERSION=1.157.0
-ARG AWS_CLI_VERSION=2.22.35
+#ARG AWS_CLI_VERSION=2.22.35
 
 USER root
 
@@ -110,14 +110,14 @@ RUN cosign version
 # -----------------------------------------------------------------------------
 # AWS CLI v2 — official versioned installer with signature verification
 # -----------------------------------------------------------------------------
-RUN curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip" \
-         -o /tmp/awscliv2.zip \
-    && curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip.sig" \
-         -o /tmp/awscliv2.zip.sig \
-    && unzip -q /tmp/awscliv2.zip -d /tmp \
-    && /tmp/aws/install \
-    && rm -rf /tmp/awscliv2.zip /tmp/awscliv2.zip.sig /tmp/aws \
-    && aws --version
+#RUN curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip" \
+#        -o /tmp/awscliv2.zip \
+#   && curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip.sig" \
+ #        -o /tmp/awscliv2.zip.sig \
+ #   && unzip -q /tmp/awscliv2.zip -d /tmp \
+  #  && /tmp/aws/install \
+   # && rm -rf /tmp/awscliv2.zip /tmp/awscliv2.zip.sig /tmp/aws \
+    #&& aws --version
 
 # -----------------------------------------------------------------------------
 # Terraform — latest stable GA
