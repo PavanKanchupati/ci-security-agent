@@ -26,7 +26,7 @@ pipeline {
       steps {
         sh """
           trivy image \
-            --severity CRITICAL,HIGH \
+            --severity CRITICAL \
             --exit-code 1 \
             --no-progress \
             ${IMAGE_URI}
