@@ -20,16 +20,20 @@ FROM --platform=linux/amd64 jenkins/inbound-agent:alpine-jdk21
 #   Semgrep     1.157.0 — latest stable (pypi.org/project/semgrep)
 #   AWS CLI     2.22.35 — latest stable
 # -----------------------------------------------------------------------------
-ARG TRIVY_VERSION=0.70.0
-ARG SYFT_VERSION=1.45.0
-ARG GRYPE_VERSION=0.120.0
-ARG COSIGN_VERSION=2.6.0
-ARG TERRAFORM_VERSION=1.15.0
-ARG KUBECTL_VERSION=1.34.0
-ARG HELM_VERSION=3.21.2
-ARG DEPENDENCY_CHECK_VERSION=12.2.0
-ARG SEMGREP_VERSION=1.157.0
-#ARG AWS_CLI_VERSION=2.22.35
+# -----------------------------------------------------------------------------
+# Tool versions — bump here only
+# Verified working versions as of April 10, 2026:
+# -----------------------------------------------------------------------------
+ARG TRIVY_VERSION=0.69.3           # Last stable before supply chain attack (v0.69.4+ compromised)
+ARG SYFT_VERSION=1.42.3            # Latest stable
+ARG GRYPE_VERSION=0.110.0          # Latest stable  
+ARG COSIGN_VERSION=2.6.3           # Latest v2 with security patches (v2.6.3 exists)
+ARG TERRAFORM_VERSION=1.14.8       # Latest GA (1.15.x still RC)
+ARG KUBECTL_VERSION=1.33.0         # Stable version within EKS support window
+ARG HELM_VERSION=3.20.2            # Latest stable v3
+ARG DEPENDENCY_CHECK_VERSION=12.2.0 # Latest stable
+ARG SEMGREP_VERSION=1.157.0        # Latest stable
+#ARG AWS_CLI_VERSION=2.22.35        # Latest stable
 
 USER root
 
